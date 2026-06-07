@@ -36,6 +36,19 @@ export const Route = createFileRoute("/product/$id")({
 const sizes = ["34", "36", "38", "40"];
 const swatches = ["#f3eedf", "#0a0a0a", "#4a4441"];
 
+function ClientViewer() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[10px] tracking-[0.2em] uppercase text-ink-soft">Preparing 3D view…</span>
+      </div>
+    );
+  }
+  return <Product3DViewer />;
+}
+
 function ProductPage() {
   const { product } = Route.useLoaderData();
   const related = products.filter((p) => p.id !== product.id).slice(0, 4);
