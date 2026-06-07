@@ -27,7 +27,7 @@ export function AdminSidebar() {
           return (
             <Link
               key={it.to}
-              to={it.to}
+              to={it.to as any}
               className={`flex items-center gap-3 px-3 h-10 text-sm rounded-sm transition ${
                 active ? "bg-primary text-primary-foreground" : "text-ink hover:bg-surface-dim"
               }`}
