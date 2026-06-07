@@ -147,7 +147,7 @@ export function Product3DViewer({ color = "#222222", label = "Click and drag to 
       {autoRotate && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="glass rounded-full px-6 py-3 flex items-center gap-3 shadow-lg">
-            <RotateCw className="w-4 h-4 animate-spin-slow" />
+            <RotateCw className="w-4 h-4 animate-spin" style={{ animationDuration: "4s" }} />
             <span className="text-[10px] tracking-[0.2em] uppercase">{label}</span>
           </div>
         </div>
