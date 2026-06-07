@@ -4,14 +4,14 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const items = [
+const items: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/inventory", label: "Inventory", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 export function AdminSidebar() {
   const { location } = useRouterState();
