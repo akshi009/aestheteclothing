@@ -1,7 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Heart, RotateCw, Maximize2, ZoomIn, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Heart, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Product3DViewer } from "@/components/Product3DViewer";
 import { getProduct, products } from "@/lib/products";
 
 export const Route = createFileRoute("/product/$id")({
@@ -115,16 +117,8 @@ function ProductPage() {
             <p className="eyebrow mb-3">Interactive Experience</p>
             <h2 className="font-serif text-3xl md:text-4xl">360° Material Exploration</h2>
           </div>
-          <div className="relative aspect-[16/7] bg-surface-dim rounded-sm overflow-hidden flex items-center justify-center">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0001_100%),repeating-linear-gradient(45deg,transparent_0_24px,#0001_24px_25px)]" />
-            <div className="glass rounded-full px-8 py-5 flex items-center gap-3 shadow-lg">
-              <RotateCw className="w-5 h-5" />
-              <span className="text-xs tracking-[0.2em] uppercase">Click and Drag to Rotate</span>
-            </div>
-            <div className="absolute bottom-6 right-6 flex gap-2">
-              <button className="w-10 h-10 rounded-full glass border border-hairline flex items-center justify-center"><ZoomIn className="w-4 h-4" /></button>
-              <button className="w-10 h-10 rounded-full glass border border-hairline flex items-center justify-center"><Maximize2 className="w-4 h-4" /></button>
-            </div>
+          <div className="relative aspect-[16/9] md:aspect-[16/7] bg-surface-dim rounded-sm overflow-hidden">
+            <ClientViewer />
           </div>
         </section>
 
