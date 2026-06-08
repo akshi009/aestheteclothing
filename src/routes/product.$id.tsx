@@ -5,6 +5,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Product3DViewer } from "@/components/Product3DViewer";
 import { getProduct, products } from "@/lib/products";
+import { useCart } from "@/lib/cart";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
   loader: ({ params }) => {
@@ -52,6 +54,12 @@ function ClientViewer() {
 function ProductPage() {
   const { product } = Route.useLoaderData();
   const related = products.filter((p) => p.id !== product.id).slice(0, 4);
+  const { add } = useCart();
+  const [size, setSize] = useState<string>("36");
+  const handleAdd = () => {
+    add({ id: product.id, name: product.name, price: product.price, image: product.image, size });
+    toast.success(`${product.name} added to bag.`);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -99,13 +107,13 @@ function ProductPage() {
                 </div>
                 <div className="grid grid-cols-4 gap-2">
                   {sizes.map((s, i) => (
-                    <button key={s} disabled={i === 3} className={`h-12 text-sm border ${i === 1 ? "border-primary" : "border-hairline"} disabled:text-ink-soft/40 disabled:line-through hover:border-primary transition`}>{s}</button>
+                    <button key={s} type="button" onClick={() => setSize(s)} disabled={i === 3} className={`h-12 text-sm border ${size === s ? "border-primary bg-primary text-primary-foreground" : "border-hairline"} disabled:text-ink-soft/40 disabled:line-through hover:border-primary transition`}>{s}</button>
                   ))}
                 </div>
               </div>
 
               <div className="mt-8 space-y-3">
-                <button className="btn-primary w-full justify-center">Add to Shopping Bag</button>
+                <button onClick={handleAdd} className="btn-primary w-full justify-center">Add to Shopping Bag</button>
                 <button className="btn-ghost w-full justify-center"><Heart className="w-4 h-4" /> Wishlist</button>
               </div>
 
