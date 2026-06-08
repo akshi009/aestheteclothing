@@ -42,12 +42,10 @@ function AdminLayout() {
   const claimAdmin = async () => {
     if (!userId) return;
     setClaiming(true);
-    const { count } = await supabase
-      .from("user_roles").select("*", { count: "exact", head: true }).eq("role", "admin");
-    if ((count ?? 0) > 0) { toast.error("An admin already exists."); setClaiming(false); await check(); return; }
-    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
+    const { data, error } = await supabase.rpc("claim_first_admin");
     setClaiming(false);
     if (error) { toast.error(error.message); return; }
+    if (!data) { toast.error("An admin already exists."); await check(); return; }
     toast.success("You are now an admin.");
     setState("ok");
   };
