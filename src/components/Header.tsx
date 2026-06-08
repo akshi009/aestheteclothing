@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Search, Heart, ShoppingBag, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Search, Heart, ShoppingBag, User, LogOut, LayoutDashboard, Package } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/useAuth";
+import { useCart } from "@/lib/cart";
 import { useState, useRef, useEffect } from "react";
 
 export function Header() {
   const { user, signOut } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
+  const { count, setOpen: openCart } = useCart();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -27,9 +29,9 @@ export function Header() {
         <div className="flex items-center gap-5 text-ink">
           <button aria-label="Search" className="hover:opacity-60 transition"><Search className="w-[18px] h-[18px] stroke-[1.5]" /></button>
           <button aria-label="Wishlist" className="hover:opacity-60 transition"><Heart className="w-[18px] h-[18px] stroke-[1.5]" /></button>
-          <button aria-label="Bag" className="relative hover:opacity-60 transition">
+          <button onClick={() => openCart(true)} aria-label="Bag" className="relative hover:opacity-60 transition">
             <ShoppingBag className="w-[18px] h-[18px] stroke-[1.5]" />
-            <span className="absolute -top-1.5 -right-2 bg-primary text-primary-foreground text-[9px] font-medium w-4 h-4 rounded-full flex items-center justify-center">0</span>
+            <span className="absolute -top-1.5 -right-2 bg-primary text-primary-foreground text-[9px] font-medium min-w-4 h-4 px-1 rounded-full flex items-center justify-center">{count}</span>
           </button>
           <div className="relative" ref={ref}>
             {user ? (
@@ -40,6 +42,9 @@ export function Header() {
                 {open && (
                   <div className="absolute right-0 top-full mt-3 w-56 bg-background border border-hairline shadow-lg py-2 text-sm">
                     <p className="px-4 py-2 text-xs text-ink-soft truncate border-b border-hairline">{user.email}</p>
+                    <Link to="/account" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2 hover:bg-surface-dim">
+                      <Package className="w-4 h-4" /> My Orders
+                    </Link>
                     {isAdmin && (
                       <Link to="/admin" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2 hover:bg-surface-dim">
                         <LayoutDashboard className="w-4 h-4" /> Atelier Console
