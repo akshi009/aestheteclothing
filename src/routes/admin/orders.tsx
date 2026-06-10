@@ -3,12 +3,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { currency, dateTime } from "@/lib/format";
-import { Eye, Trash2, X } from "lucide-react";
+import { Eye, Trash2, X, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
+import { ORDER_STATUSES, STATUS_LABEL } from "@/lib/orders";
 
 export const Route = createFileRoute("/admin/orders")({ component: Orders });
 
-const statuses = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
+const statuses = ORDER_STATUSES;
 
 function Orders() {
   const qc = useQueryClient();
