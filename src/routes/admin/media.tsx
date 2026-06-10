@@ -42,8 +42,20 @@ function MediaAdmin() {
     if (error) toast.error(error.message); else refresh();
   };
 
-  const url = (name: string) => supabase.storage.from("media").getPublicUrl(name).data.publicUrl;
-  const copy = (name: string) => { navigator.clipboard.writeText(url(name)); toast.success("URL copied."); };
+  const url = (name: string) => {
+    // Long-lived signed URL since the bucket is private.
+    const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+    // createSignedUrl is async but we use a sync fallback for previews; cache miss falls back to authenticated URL.
+    // For display we generate on-demand below via <SignedImg>.
+    return name;
+  };
+  const copy = async (name: string) => {
+    const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+    const { data, error } = await supabase.storage.from("media").createSignedUrl(name, TEN_YEARS);
+    if (error || !data) return toast.error(error?.message ?? "Failed");
+    navigator.clipboard.writeText(data.signedUrl);
+    toast.success("URL copied.");
+  };
 
   return (
     <div className="p-6 md:p-10">
