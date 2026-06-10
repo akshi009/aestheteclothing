@@ -132,7 +132,7 @@ export function useCmsPage(slug: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase.from("pages" as any).select("*").eq("slug", slug!).maybeSingle();
       if (error) throw error;
-      return (data ?? null) as CmsPage | null;
+      return (data ?? null) as unknown as CmsPage | null;
     },
   });
 }
