@@ -89,7 +89,7 @@ function Orders() {
                 <td className="p-4 font-serif">{currency(o.total)}</td>
                 <td className="p-4">
                   <select value={o.status} onChange={(e) => updateStatus(o.id, e.target.value)} className="text-xs border border-hairline bg-transparent h-8 px-2">
-                    {statuses.map((s) => <option key={s} value={s}>{s}</option>)}
+                    {statuses.map((s) => <option key={s} value={s}>{STATUS_LABEL[s] ?? s}</option>)}
                   </select>
                 </td>
                 <td className="p-4 text-ink-soft text-xs">{dateTime(o.created_at)}</td>
