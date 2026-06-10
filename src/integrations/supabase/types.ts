@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      homepage_sections: {
+        Row: {
+          body: string | null
+          cta_label: string | null
+          cta_url: string | null
+          extra: Json
+          id: string
+          image_url: string | null
+          key: string
+          position: number
+          subtitle: string | null
+          title: string | null
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          body?: string | null
+          cta_label?: string | null
+          cta_url?: string | null
+          extra?: Json
+          id?: string
+          image_url?: string | null
+          key: string
+          position?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          body?: string | null
+          cta_label?: string | null
+          cta_url?: string | null
+          extra?: Json
+          id?: string
+          image_url?: string | null
+          key?: string
+          position?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      nav_items: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          location: string
+          open_new_tab: boolean
+          parent_id: string | null
+          position: number
+          url: string
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          location: string
+          open_new_tab?: boolean
+          parent_id?: string | null
+          position?: number
+          url: string
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          location?: string
+          open_new_tab?: boolean
+          parent_id?: string | null
+          position?: number
+          url?: string
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nav_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "nav_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
@@ -95,6 +184,45 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      pages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          position: number
+          slug: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          position?: number
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          position?: number
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
