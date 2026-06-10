@@ -84,6 +84,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "AESTHETE is a luxury fashion atelier blending tailored craftsmanship with immersive digital experiences." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "AESTHETE — Quiet Luxury & Digital Craftsmanship" },
+      { name: "twitter:title", content: "AESTHETE — Quiet Luxury & Digital Craftsmanship" },
+      { property: "og:description", content: "AESTHETE is a luxury fashion atelier blending tailored craftsmanship with immersive digital experiences." },
+      { name: "twitter:description", content: "AESTHETE is a luxury fashion atelier blending tailored craftsmanship with immersive digital experiences." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c3ce38c4-46fa-43c9-9759-f58e88bf2dae/id-preview-3e2d180f--f90bd7ba-a2fd-479f-875e-98daacab9e9a.lovable.app-1781117173103.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c3ce38c4-46fa-43c9-9759-f58e88bf2dae/id-preview-3e2d180f--f90bd7ba-a2fd-479f-875e-98daacab9e9a.lovable.app-1781117173103.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
