@@ -2,12 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { Search, Heart, ShoppingBag, User, LogOut, LayoutDashboard, Package } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/useAuth";
 import { useCart } from "@/lib/cart";
+import { useSiteSettings } from "@/lib/storefront";
 import { useState, useRef, useEffect } from "react";
 
 export function Header() {
   const { user, signOut } = useAuth();
   const isAdmin = useIsAdmin(user?.id);
   const { count, setOpen: openCart } = useCart();
+  const { data: settings } = useSiteSettings();
+  const storeName = settings?.general.store_name ?? "AESTHETE";
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -19,7 +22,7 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-hairline">
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 h-16 md:h-20 flex items-center justify-between">
-        <Link to="/" className="font-serif text-2xl md:text-3xl tracking-[0.18em] font-bold">AESTHETE</Link>
+        <Link to="/" className="font-serif text-2xl md:text-3xl tracking-[0.18em] font-bold uppercase">{storeName}</Link>
         <nav className="hidden md:flex items-center gap-10">
           <Link to="/collections" className="nav-link">Collections</Link>
           <Link to="/collections" search={{ filter: "new" } as never} className="nav-link">New Arrivals</Link>

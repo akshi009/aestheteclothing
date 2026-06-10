@@ -1,65 +1,65 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Heart, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { Heart, ChevronDown } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Product3DViewer } from "@/components/Product3DViewer";
-import { getProduct, products } from "@/lib/products";
+import { useProductBySlug, useProducts } from "@/lib/storefront";
 import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
-  loader: ({ params }) => {
-    const product = getProduct(params.id);
-    if (!product) throw notFound();
-    return { product };
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.product.name} | AESTHETE` },
-          { name: "description", content: loaderData.product.description ?? loaderData.product.name },
-          { property: "og:title", content: `${loaderData.product.name} | AESTHETE` },
-          { property: "og:description", content: loaderData.product.description ?? loaderData.product.name },
-          { property: "og:image", content: loaderData.product.image },
-          { name: "twitter:image", content: loaderData.product.image },
-        ]
-      : [],
+  head: ({ params }) => ({
+    meta: [
+      { title: `Product | AESTHETE` },
+      { name: "description", content: `Discover ${params.id} at AESTHETE.` },
+    ],
   }),
-  notFoundComponent: () => (
-    <div className="min-h-screen flex items-center justify-center">Product not found.</div>
-  ),
-  errorComponent: () => (
-    <div className="min-h-screen flex items-center justify-center">Something went wrong.</div>
-  ),
   component: ProductPage,
 });
 
-const sizes = ["34", "36", "38", "40"];
-const swatches = ["#f3eedf", "#0a0a0a", "#4a4441"];
+const sizes = ["XS", "S", "M", "L", "XL"];
 
-function ClientViewer() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) {
+function ProductPage() {
+  const { id } = Route.useParams();
+  const { data: product, isLoading } = useProductBySlug(id);
+  const { data: all = [] } = useProducts();
+  const { add } = useCart();
+  const [size, setSize] = useState<string>("M");
+
+  if (isLoading) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-[10px] tracking-[0.2em] uppercase text-ink-soft">Preparing 3D view…</span>
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
+        <div className="pt-32 text-center text-ink-soft">Loading…</div>
       </div>
     );
   }
-  return <Product3DViewer />;
-}
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
+        <div className="pt-32 text-center">
+          <p className="text-ink-soft mb-4">Product not found.</p>
+          <Link to="/collections" className="btn-primary inline-flex">Browse Collections</Link>
+        </div>
+      </div>
+    );
+  }
 
-function ProductPage() {
-  const { product } = Route.useLoaderData();
-  const related = products.filter((p) => p.id !== product.id).slice(0, 4);
-  const { add } = useCart();
-  const [size, setSize] = useState<string>("36");
   const handleAdd = () => {
-    add({ id: product.id, name: product.name, price: product.price, image: product.image, size });
+    if (product.stock <= 0) { toast.error("Out of stock."); return; }
+    add({
+      id: `${product.id}`,
+      productId: product.id,
+      name: product.name,
+      price: Number(product.price),
+      image: product.image_url ?? "",
+      size,
+    });
     toast.success(`${product.name} added to bag.`);
   };
+
+  const related = all.filter((p) => p.id !== product.id).slice(0, 4);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -73,47 +73,34 @@ function ProductPage() {
           </p>
 
           <div className="grid lg:grid-cols-2 gap-10 md:gap-16">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2 aspect-[4/5] overflow-hidden bg-surface-dim rounded-sm">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover" width={768} height={1024} />
-              </div>
-              <div className="aspect-square overflow-hidden bg-surface-dim rounded-sm">
-                <img src={product.image} alt="" className="w-full h-full object-cover" loading="lazy" />
-              </div>
-              <div className="aspect-square overflow-hidden bg-surface-dim rounded-sm">
-                <img src={product.image} alt="" className="w-full h-full object-cover" loading="lazy" />
-              </div>
+            <div className="aspect-[4/5] overflow-hidden bg-surface-dim rounded-sm">
+              {product.image_url ? (
+                <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" width={768} height={1024} />
+              ) : <div className="w-full h-full" />}
             </div>
 
             <div className="lg:sticky lg:top-28 self-start">
-              <p className="eyebrow mb-4">Artisan Series / Edition 01</p>
+              <p className="eyebrow mb-4">{product.category}</p>
               <h1 className="font-serif text-4xl md:text-5xl leading-tight">{product.name}</h1>
-              <p className="font-serif text-2xl mt-4">${product.price.toLocaleString()}.00</p>
-              <p className="mt-8 text-ink-soft leading-relaxed">{product.description}</p>
-
-              <div className="mt-10">
-                <p className="eyebrow mb-3">Color / Ivory Shell</p>
-                <div className="flex gap-3">
-                  {swatches.map((c, i) => (
-                    <button key={c} className={`w-9 h-9 rounded-full ring-1 ${i === 0 ? "ring-primary ring-offset-2" : "ring-hairline"}`} style={{ backgroundColor: c }} />
-                  ))}
-                </div>
-              </div>
+              <p className="font-serif text-2xl mt-4">${Number(product.price).toLocaleString()}.00</p>
+              <p className="mt-2 text-xs tracking-[0.2em] uppercase text-ink-soft">
+                {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+              </p>
+              <p className="mt-8 text-ink-soft leading-relaxed whitespace-pre-line">{product.description}</p>
 
               <div className="mt-8">
-                <div className="flex justify-between mb-3">
-                  <p className="eyebrow">Select Size / EU</p>
-                  <button className="text-[10px] tracking-[0.2em] uppercase text-ink-soft underline">Size Guide</button>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {sizes.map((s, i) => (
-                    <button key={s} type="button" onClick={() => setSize(s)} disabled={i === 3} className={`h-12 text-sm border ${size === s ? "border-primary bg-primary text-primary-foreground" : "border-hairline"} disabled:text-ink-soft/40 disabled:line-through hover:border-primary transition`}>{s}</button>
+                <p className="eyebrow mb-3">Select Size</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {sizes.map((s) => (
+                    <button key={s} type="button" onClick={() => setSize(s)} className={`h-12 text-sm border ${size === s ? "border-primary bg-primary text-primary-foreground" : "border-hairline"} hover:border-primary transition`}>{s}</button>
                   ))}
                 </div>
               </div>
 
               <div className="mt-8 space-y-3">
-                <button onClick={handleAdd} className="btn-primary w-full justify-center">Add to Shopping Bag</button>
+                <button onClick={handleAdd} disabled={product.stock <= 0} className="btn-primary w-full justify-center disabled:opacity-50">
+                  {product.stock > 0 ? "Add to Shopping Bag" : "Sold Out"}
+                </button>
                 <button className="btn-ghost w-full justify-center"><Heart className="w-4 h-4" /> Wishlist</button>
               </div>
 
@@ -124,7 +111,7 @@ function ProductPage() {
                       {t}
                       <ChevronDown className="w-4 h-4 group-open:rotate-180 transition" />
                     </summary>
-                    <p className="text-sm text-ink-soft pb-5 leading-relaxed">100% Italian wool, dry clean only. Crafted with traceable fibers from family-run mills.</p>
+                    <p className="text-sm text-ink-soft pb-5 leading-relaxed">Crafted with traceable fibers from family-run mills.</p>
                   </details>
                 ))}
               </div>
@@ -132,39 +119,23 @@ function ProductPage() {
           </div>
         </div>
 
-        {/* 360 SECTION */}
-        <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-24 md:mt-32">
-          <div className="text-center mb-10">
-            <p className="eyebrow mb-3">Interactive Experience</p>
-            <h2 className="font-serif text-3xl md:text-4xl">360° Material Exploration</h2>
-          </div>
-          <div className="relative aspect-[16/9] md:aspect-[16/7] bg-surface-dim rounded-sm overflow-hidden">
-            <ClientViewer />
-          </div>
-        </section>
-
-        {/* COMPLETE THE LOOK */}
-        <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-24 md:mt-32">
-          <div className="flex items-end justify-between mb-10">
-            <h2 className="font-serif text-3xl md:text-4xl">Complete the Look</h2>
-            <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full border border-hairline flex items-center justify-center"><ChevronLeft className="w-4 h-4" /></button>
-              <button className="w-10 h-10 rounded-full border border-hairline flex items-center justify-center"><ChevronRight className="w-4 h-4" /></button>
+        {related.length > 0 && (
+          <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-24 md:mt-32">
+            <h2 className="font-serif text-3xl md:text-4xl mb-10">Complete the Look</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+              {related.map((p) => (
+                <Link key={p.id} to="/product/$id" params={{ id: p.slug }} className="group">
+                  <div className="aspect-[3/4] overflow-hidden bg-surface-dim rounded-sm">
+                    {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" loading="lazy" />}
+                  </div>
+                  <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-ink-soft">{p.category}</p>
+                  <p className="text-sm font-medium mt-1 truncate">{p.name}</p>
+                  <p className="text-sm text-ink-soft mt-0.5">${Number(p.price).toLocaleString()}.00</p>
+                </Link>
+              ))}
             </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {related.map((p) => (
-              <Link key={p.id} to="/product/$id" params={{ id: p.id }} className="group">
-                <div className="aspect-[3/4] overflow-hidden bg-surface-dim rounded-sm">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" loading="lazy" width={768} height={1024} />
-                </div>
-                <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-ink-soft">{p.category}</p>
-                <p className="text-sm font-medium mt-1 truncate">{p.name}</p>
-                <p className="text-sm text-ink-soft mt-0.5">${p.price.toLocaleString()}.00</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+          </section>
+        )}
       </main>
       <Footer />
     </div>
