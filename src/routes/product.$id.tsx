@@ -86,6 +86,12 @@ function ProductPage() {
             <div className="lg:sticky lg:top-28 self-start">
               <p className="eyebrow mb-4">{product.category}</p>
               <h1 className="font-serif text-4xl md:text-5xl leading-tight">{product.name}</h1>
+              {reviews.length > 0 && (
+                <div className="mt-3 flex items-center gap-2 text-sm">
+                  <div className="flex">{[1,2,3,4,5].map((n) => <Star key={n} className={`w-4 h-4 ${n <= Math.round(avg) ? "fill-current" : "text-ink-soft"}`} />)}</div>
+                  <span className="text-ink-soft">{avg.toFixed(1)} · {reviews.length} review{reviews.length === 1 ? "" : "s"}</span>
+                </div>
+              )}
               <p className="font-serif text-2xl mt-4">{currency(product.price)}</p>
               <p className="mt-2 text-xs tracking-[0.2em] uppercase text-ink-soft">
                 {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
