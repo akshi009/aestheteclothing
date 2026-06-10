@@ -8,7 +8,7 @@ import bagImg from "@/assets/collection-bag.jpg";
 import atelierImg from "@/assets/collection-atelier.jpg";
 import eveningImg from "@/assets/collection-evening.jpg";
 import heritageImg from "@/assets/heritage.jpg";
-import { products } from "@/lib/products";
+import { useProducts, useSiteSettings } from "@/lib/storefront";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,7 +23,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const essentials = products.slice(0, 4);
+  const { data: settings } = useSiteSettings();
+  const { data: featured = [] } = useProducts({ featuredOnly: true });
+  const { data: all = [] } = useProducts();
+  const essentials = (featured.length > 0 ? featured : all).slice(0, 4);
+  const storeName = settings?.general.store_name ?? "AESTHETE";
+  const tagline = settings?.general.tagline ?? "";
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -32,13 +38,13 @@ function Home() {
         <section className="relative overflow-hidden bg-surface-dim/40">
           <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
             <div className="animate-fade-up">
-              <p className="eyebrow mb-6">L'Atelier Series 01</p>
+              <p className="eyebrow mb-6">{storeName} · L'Atelier Series 01</p>
               <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight">
                 The <br /> Architectural <br />
                 <em className="italic font-normal">Silhouette</em>
               </h1>
               <p className="mt-8 text-ink-soft max-w-md leading-relaxed">
-                Exploring the intersection of structural engineering and high-performance tailoring. A jacket designed for the modern visionary.
+                {tagline || "Exploring the intersection of structural engineering and high-performance tailoring. A jacket designed for the modern visionary."}
               </p>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link to="/collections" className="btn-primary">
@@ -50,10 +56,6 @@ function Home() {
             <div className="relative aspect-[4/5] md:aspect-square bg-gradient-to-b from-neutral-200 to-neutral-300 rounded-sm overflow-hidden">
               <img src={heroJacket} alt="Architectural silhouette jacket" className="absolute inset-0 w-full h-full object-cover animate-float" width={1280} height={1280} />
             </div>
-          </div>
-          <div className="max-w-[1440px] mx-auto px-6 md:px-10 pb-10 flex items-center gap-4 text-xs tracking-[0.2em] text-ink-soft uppercase">
-            <span className="h-px w-12 bg-ink-soft/40" />
-            Scroll to Explore
           </div>
         </section>
 
@@ -78,7 +80,7 @@ function Home() {
             </Link>
             <Link to="/collections" className="group relative aspect-[16/10] md:aspect-auto overflow-hidden rounded-sm bg-neutral-900">
               <img src={bagImg} alt="Leather goods" className="w-full h-full object-cover group-hover:scale-105 transition duration-1000" loading="lazy" width={768} height={768} />
-              <span className="absolute top-6 left-6 px-3 py-1.5 glass text-[10px] tracking-[0.2em] uppercase rounded-sm">Aesthete</span>
+              <span className="absolute top-6 left-6 px-3 py-1.5 glass text-[10px] tracking-[0.2em] uppercase rounded-sm">{storeName}</span>
             </Link>
             <Link to="/collections" className="group relative aspect-[16/10] overflow-hidden rounded-sm">
               <img src={atelierImg} alt="Coming soon" className="w-full h-full object-cover group-hover:scale-105 transition duration-1000" loading="lazy" width={768} height={512} />
@@ -104,22 +106,11 @@ function Home() {
                 Crafted for <br /><em className="italic font-normal">Eternity</em>
               </h2>
               <p className="mt-8 text-white/70 leading-relaxed max-w-md">
-                At AESTHETE, we believe luxury isn't a price point, it's a philosophy. Every garment is born in our Milanese atelier, where traditional hand-stitching meets advanced structural modeling. Our commitment to sustainability means small-batch production and fabrics sourced from centuries-old family mills.
+                At {storeName}, we believe luxury isn't a price point, it's a philosophy. Every garment is born in our Milanese atelier, where traditional hand-stitching meets advanced structural modeling.
               </p>
-              <div className="mt-12 grid grid-cols-3 gap-6 max-w-md">
-                {[["24", "Heritage Years"],["100%", "Traceable Wool"],["08", "Master Tailors"]].map(([n, l]) => (
-                  <div key={l}>
-                    <p className="font-serif text-3xl">{n}</p>
-                    <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1">{l}</p>
-                  </div>
-                ))}
-              </div>
             </div>
             <div className="relative">
               <img src={heritageImg} alt="Master tailor at work" className="w-full aspect-[4/3] object-cover rounded-sm grayscale" loading="lazy" width={1024} height={768} />
-              <div className="absolute -bottom-6 -right-2 md:right-10 bg-white text-foreground p-6 max-w-xs rounded-sm shadow-xl">
-                <p className="font-serif italic text-lg leading-snug">"Details are not the details. They make the design."</p>
-              </div>
             </div>
           </div>
         </section>
@@ -129,25 +120,31 @@ function Home() {
           <div className="flex items-end justify-between mb-10">
             <div>
               <p className="eyebrow mb-3">The Selection</p>
-              <h2 className="font-serif text-4xl md:text-5xl">Essential Pieces</h2>
+              <h2 className="font-serif text-4xl md:text-5xl">{featured.length > 0 ? "Featured Pieces" : "Essential Pieces"}</h2>
             </div>
             <div className="hidden md:flex gap-2">
               <button className="w-10 h-10 rounded-full border border-hairline flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition"><ChevronLeft className="w-4 h-4" /></button>
               <button className="w-10 h-10 rounded-full border border-hairline flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition"><ChevronRight className="w-4 h-4" /></button>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {essentials.map((p) => (
-              <Link key={p.id} to="/product/$id" params={{ id: p.id }} className="group">
-                <div className="aspect-[3/4] overflow-hidden bg-surface-dim rounded-sm">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" loading="lazy" width={768} height={1024} />
-                </div>
-                <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-ink-soft">{p.category}</p>
-                <p className="text-sm font-medium mt-1">{p.name}</p>
-                <p className="text-sm text-ink-soft mt-0.5">${p.price.toLocaleString()}</p>
-              </Link>
-            ))}
-          </div>
+          {essentials.length === 0 ? (
+            <p className="text-ink-soft text-sm">No products published yet. Add some from the Atelier console.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {essentials.map((p) => (
+                <Link key={p.id} to="/product/$id" params={{ id: p.slug }} className="group">
+                  <div className="aspect-[3/4] overflow-hidden bg-surface-dim rounded-sm">
+                    {p.image_url ? (
+                      <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" loading="lazy" width={768} height={1024} />
+                    ) : <div className="w-full h-full bg-surface-dim" />}
+                  </div>
+                  <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-ink-soft">{p.category}</p>
+                  <p className="text-sm font-medium mt-1">{p.name}</p>
+                  <p className="text-sm text-ink-soft mt-0.5">${Number(p.price).toLocaleString()}</p>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* NEWSLETTER */}
@@ -160,7 +157,6 @@ function Home() {
               <input type="email" placeholder="Your Email Address" className="flex-1 px-5 py-4 bg-white border border-hairline rounded-sm text-sm focus:outline-none focus:border-primary" />
               <button className="btn-primary justify-center">Subscribe</button>
             </form>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-ink-soft mt-6">By subscribing you agree to our privacy policy</p>
           </div>
         </section>
       </main>

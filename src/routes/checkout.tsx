@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/lib/cart";
+import { useSiteSettings } from "@/lib/storefront";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
@@ -28,12 +29,15 @@ const schema = z.object({
 
 function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
+  const { data: settings } = useSiteSettings();
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({ customer_name: "", customer_email: "", line1: "", line2: "", city: "", region: "", postal: "", country: "United States", notes: "" });
 
-  const shipping = subtotal > 0 && subtotal < 500 ? 25 : 0;
+  const threshold = settings?.shipping.free_shipping_threshold ?? 500;
+  const standardRate = settings?.shipping.standard_rate ?? 25;
+  const shipping = subtotal > 0 && subtotal < threshold ? standardRate : 0;
   const total = subtotal + shipping;
 
   useEffect(() => {
@@ -88,7 +92,7 @@ function CheckoutPage() {
     const { error: itemsErr } = await supabase.from("order_items").insert(
       items.map((i) => ({
         order_id: order.id,
-        product_id: null,
+        product_id: i.productId ?? null,
         name: `${i.name}${i.size ? ` (Size ${i.size})` : ""}`,
         price: i.price,
         quantity: i.quantity,

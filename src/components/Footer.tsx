@@ -1,15 +1,21 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Twitter, Send } from "lucide-react";
+import { useSiteSettings } from "@/lib/storefront";
 
 export function Footer() {
+  const { data: settings } = useSiteSettings();
+  const storeName = settings?.general.store_name ?? "AESTHETE";
+  const tagline = settings?.general.tagline ?? "High-end luxury fashion prioritizing quiet luxury and digital craftsmanship.";
+  const supportEmail = settings?.general.support_email;
   return (
     <footer className="border-t border-hairline bg-surface-dim/40">
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
         <div>
-          <p className="font-serif text-xl tracking-[0.18em] font-bold mb-4">AESTHETE</p>
+          <p className="font-serif text-xl tracking-[0.18em] font-bold mb-4 uppercase">{storeName}</p>
           <p className="text-sm text-ink-soft leading-relaxed max-w-[220px]">
-            High-end luxury fashion prioritizing quiet luxury and digital craftsmanship since 1994.
+            {tagline}
           </p>
+          {supportEmail && <p className="text-xs text-ink-soft mt-3">{supportEmail}</p>}
         </div>
         <div>
           <p className="eyebrow mb-5">Collection</p>
@@ -42,7 +48,7 @@ export function Footer() {
       </div>
       <div className="border-t border-hairline">
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-6 flex flex-wrap justify-between text-xs text-ink-soft tracking-wider">
-          <span>© 2026 AESTHETE LUXURY. ALL RIGHTS RESERVED.</span>
+          <span>© 2026 {storeName.toUpperCase()}. ALL RIGHTS RESERVED.</span>
           <span className="space-x-6"><span>MILAN</span><span>PARIS</span><span>NEW YORK</span></span>
         </div>
       </div>
