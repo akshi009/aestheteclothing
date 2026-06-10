@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { currency } from "@/lib/format";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout | AESTHETE" }, { name: "robots", content: "noindex" }] }),
@@ -33,10 +34,10 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ customer_name: "", customer_email: "", line1: "", line2: "", city: "", region: "", postal: "", country: "United States", notes: "" });
+  const [form, setForm] = useState({ customer_name: "", customer_email: "", line1: "", line2: "", city: "", region: "", postal: "", country: "India", notes: "" });
 
-  const threshold = settings?.shipping.free_shipping_threshold ?? 500;
-  const standardRate = settings?.shipping.standard_rate ?? 25;
+  const threshold = settings?.shipping.free_shipping_threshold ?? 5000;
+  const standardRate = settings?.shipping.standard_rate ?? 250;
   const shipping = subtotal > 0 && subtotal < threshold ? standardRate : 0;
   const total = subtotal + shipping;
 
@@ -155,13 +156,13 @@ function CheckoutPage() {
                 {items.map((i) => (
                   <li key={`${i.id}-${i.size ?? ""}`} className="py-3 flex justify-between text-sm">
                     <span className="truncate pr-3">{i.name} × {i.quantity}</span>
-                    <span>${(i.price * i.quantity).toLocaleString()}</span>
+                    <span>{currency(i.price * i.quantity)}</span>
                   </li>
                 ))}
               </ul>
-              <div className="flex justify-between text-sm"><span className="text-ink-soft">Subtotal</span><span>${subtotal.toLocaleString()}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-ink-soft">Shipping</span><span>{shipping === 0 ? "Complimentary" : `$${shipping}`}</span></div>
-              <div className="flex justify-between border-t border-hairline pt-4"><span className="font-medium">Total</span><span className="font-serif text-xl">${total.toLocaleString()}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-ink-soft">Subtotal</span><span>{currency(subtotal)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-ink-soft">Shipping</span><span>{shipping === 0 ? "Complimentary" : currency(shipping)}</span></div>
+              <div className="flex justify-between border-t border-hairline pt-4"><span className="font-medium">Total</span><span className="font-serif text-xl">{currency(total)}</span></div>
               <button type="submit" disabled={busy} className="btn-primary w-full justify-center">
                 {busy && <Loader2 className="w-4 h-4 animate-spin" />}
                 Place Order

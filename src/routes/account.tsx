@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Loader2, Package } from "lucide-react";
+import { currency } from "@/lib/format";
 
 export const Route = createFileRoute("/account")({
   head: () => ({ meta: [{ title: "My Account | AESTHETE" }, { name: "robots", content: "noindex" }] }),
@@ -82,13 +83,13 @@ function AccountPage() {
                       <p className="text-xs text-ink-soft">{new Date(o.created_at).toLocaleDateString(undefined, { dateStyle: "medium" })}</p>
                     </div>
                     <span className={`text-[10px] tracking-[0.2em] uppercase px-3 py-1.5 ${statusStyles[o.status] ?? "bg-surface-dim"}`}>{o.status}</span>
-                    <p className="font-serif text-xl">${Number(o.total).toLocaleString()}</p>
+                    <p className="font-serif text-xl">{currency(o.total)}</p>
                   </div>
                   <ul className="divide-y divide-hairline px-6">
                     {o.order_items?.map((it) => (
                       <li key={it.id} className="py-3 flex justify-between text-sm">
                         <span className="truncate pr-3">{it.name} × {it.quantity}</span>
-                        <span className="text-ink-soft">${(Number(it.price) * it.quantity).toLocaleString()}</span>
+                        <span className="text-ink-soft">{currency(Number(it.price) * it.quantity)}</span>
                       </li>
                     ))}
                   </ul>

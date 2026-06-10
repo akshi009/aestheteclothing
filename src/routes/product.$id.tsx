@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useProductBySlug, useProducts } from "@/lib/storefront";
 import { useCart } from "@/lib/cart";
+import { currency } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$id")({
@@ -82,7 +83,7 @@ function ProductPage() {
             <div className="lg:sticky lg:top-28 self-start">
               <p className="eyebrow mb-4">{product.category}</p>
               <h1 className="font-serif text-4xl md:text-5xl leading-tight">{product.name}</h1>
-              <p className="font-serif text-2xl mt-4">${Number(product.price).toLocaleString()}.00</p>
+              <p className="font-serif text-2xl mt-4">{currency(product.price)}</p>
               <p className="mt-2 text-xs tracking-[0.2em] uppercase text-ink-soft">
                 {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
               </p>
@@ -130,7 +131,7 @@ function ProductPage() {
                   </div>
                   <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-ink-soft">{p.category}</p>
                   <p className="text-sm font-medium mt-1 truncate">{p.name}</p>
-                  <p className="text-sm text-ink-soft mt-0.5">${Number(p.price).toLocaleString()}.00</p>
+                  <p className="text-sm text-ink-soft mt-0.5">{currency(p.price)}</p>
                 </Link>
               ))}
             </div>

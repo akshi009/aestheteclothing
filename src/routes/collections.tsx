@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useProducts } from "@/lib/storefront";
+import { currency } from "@/lib/format";
 
 export const Route = createFileRoute("/collections")({
   head: () => ({
@@ -93,7 +94,7 @@ function Collections() {
                     </div>
                     <p className="mt-4 text-[10px] tracking-[0.2em] uppercase text-ink-soft">{p.category}</p>
                     <p className="text-sm font-medium mt-1 truncate">{p.name}</p>
-                    <p className="text-sm text-ink-soft mt-0.5">${Number(p.price).toLocaleString()}</p>
+                    <p className="text-sm text-ink-soft mt-0.5">{currency(p.price)}</p>
                   </Link>
                 ))}
               </div>
