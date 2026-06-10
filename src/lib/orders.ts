@@ -59,7 +59,11 @@ export function useMyOrders() {
   useEffect(() => {
     const ch = supabase.channel("my-orders-live")
       .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => qc.invalidateQueries({ queryKey: ["my-orders"] }))
-      .on("postgres_changes", { event: "*", schema: "public", table: "order_events" }, () => qc.invalidateQueries({ queryKey: /^order-events|my-orders/ as any }))
+      .on("postgres_changes", { event: "*", schema: "public", table: "order_events" }, (payload: any) => {
+        const oid = (payload?.new ?? payload?.old)?.order_id;
+        if (oid) qc.invalidateQueries({ queryKey: ["order-events", oid] });
+        qc.invalidateQueries({ queryKey: ["my-orders"] });
+      })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [qc]);
