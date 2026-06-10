@@ -16,7 +16,7 @@ function NavAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase.from("nav_items" as any).select("*").order("location").order("position");
       if (error) throw error;
-      return (data ?? []) as NavItem[];
+      return (data ?? []) as unknown as NavItem[];
     },
   });
 

@@ -51,7 +51,7 @@ export function useProducts(opts?: { featuredOnly?: boolean }) {
       if (opts?.featuredOnly) q = q.eq("featured", true);
       const { data, error } = await q;
       if (error) throw error;
-      return (data ?? []) as StoreProduct[];
+      return (data ?? []) as unknown as StoreProduct[];
     },
   });
 }
@@ -95,7 +95,7 @@ export function useHomepageSections() {
     queryFn: async () => {
       const { data, error } = await supabase.from("homepage_sections" as any).select("*").order("position");
       if (error) throw error;
-      return (data ?? []) as HomepageSection[];
+      return (data ?? []) as unknown as HomepageSection[];
     },
     staleTime: 30_000,
   });
@@ -119,7 +119,7 @@ export function useNavItems(location: "header" | "footer") {
         .eq("visible", true)
         .order("position");
       if (error) throw error;
-      return (data ?? []) as NavItem[];
+      return (data ?? []) as unknown as NavItem[];
     },
     staleTime: 60_000,
   });

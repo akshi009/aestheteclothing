@@ -28,7 +28,7 @@ function HomepageAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase.from("homepage_sections" as any).select("*").order("position");
       if (error) throw error;
-      return (data ?? []) as Section[];
+      return (data ?? []) as unknown as Section[];
     },
   });
 

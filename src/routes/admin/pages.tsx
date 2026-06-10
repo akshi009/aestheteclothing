@@ -20,7 +20,7 @@ function PagesAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase.from("pages" as any).select("*").order("title");
       if (error) throw error;
-      return (data ?? []) as Page[];
+      return (data ?? []) as unknown as Page[];
     },
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin-pages"] });
