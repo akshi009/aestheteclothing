@@ -129,6 +129,29 @@ function ProductPage() {
           </div>
         </div>
 
+        <section className="max-w-[1200px] mx-auto px-6 md:px-10 mt-20">
+          <h2 className="font-serif text-3xl md:text-4xl mb-8">Customer Reviews</h2>
+          {reviews.length === 0 ? (
+            <p className="text-ink-soft text-sm">No reviews yet. Be the first to share your thoughts after your delivery.</p>
+          ) : (
+            <ul className="grid md:grid-cols-2 gap-5">
+              {reviews.map((r: any) => (
+                <li key={r.id} className="border border-hairline p-6 bg-card">
+                  <div className="flex gap-1 mb-2">{[1,2,3,4,5].map((n) => <Star key={n} className={`w-4 h-4 ${n <= r.rating ? "fill-current" : "text-ink-soft"}`} />)}</div>
+                  {r.title && <p className="font-medium mb-1">{r.title}</p>}
+                  {r.body && <p className="text-sm text-ink-soft leading-relaxed whitespace-pre-line">{r.body}</p>}
+                  {Array.isArray(r.images) && r.images.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {r.images.map((u: string) => <img key={u} src={u} alt="" className="w-16 h-16 object-cover border border-hairline" />)}
+                    </div>
+                  )}
+                  <p className="text-xs text-ink-soft mt-3">— {r.author_name || "Customer"}, {new Date(r.created_at).toLocaleDateString()}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
         {related.length > 0 && (
           <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-24 md:mt-32">
             <h2 className="font-serif text-3xl md:text-4xl mb-10">Complete the Look</h2>
