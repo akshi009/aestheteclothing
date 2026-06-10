@@ -146,15 +146,65 @@ function OrderDetail({ order, onClose }: { order: any; onClose: () => void }) {
             <div className="border border-hairline">
               {items.length === 0 && <p className="p-4 text-sm text-ink-soft">No items recorded.</p>}
               {items.map((it: any) => (
-                <div key={it.id} className="flex justify-between p-4 border-b border-hairline last:border-0 text-sm">
-                  <div><p className="font-medium">{it.name}</p><p className="text-xs text-ink-soft">Qty {it.quantity}</p></div>
+                <div key={it.id} className="flex items-center gap-3 p-4 border-b border-hairline last:border-0 text-sm">
+                  {it.image_url && <img src={it.image_url} alt="" className="w-12 h-12 object-cover border border-hairline" />}
+                  <div className="flex-1 min-w-0"><p className="font-medium truncate">{it.name}</p><p className="text-xs text-ink-soft">Qty {it.quantity}</p></div>
                   <p>{currency(Number(it.price) * it.quantity)}</p>
                 </div>
               ))}
             </div>
           </div>
           {order.notes && <div><p className="eyebrow mb-1">Notes</p><p className="text-sm text-ink-soft">{order.notes}</p></div>}
+          <OrderTimeline orderId={order.id} />
         </div>
+      </div>
+    </div>
+  );
+}
+
+function OrderTimeline({ orderId }: { orderId: string }) {
+  const qc = useQueryClient();
+  const [note, setNote] = useState("");
+  const { data: events = [] } = useQuery({
+    queryKey: ["admin-order-events", orderId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("order_events" as any).select("*").eq("order_id", orderId).order("created_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+  useEffect(() => {
+    const ch = supabase.channel(`adm-evt-${orderId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "order_events", filter: `order_id=eq.${orderId}` },
+        () => qc.invalidateQueries({ queryKey: ["admin-order-events", orderId] }))
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [orderId, qc]);
+  const addNote = async () => {
+    if (!note.trim()) return;
+    const { error } = await supabase.from("order_events" as any).insert({ order_id: orderId, note, actor_role: "admin" } as any);
+    if (error) return toast.error(error.message);
+    setNote("");
+  };
+  return (
+    <div>
+      <p className="eyebrow mb-3">Timeline</p>
+      <ol className="border border-hairline divide-y divide-hairline">
+        {events.length === 0 && <li className="p-3 text-sm text-ink-soft">No events.</li>}
+        {events.map((e: any) => (
+          <li key={e.id} className="p-3 text-xs flex gap-3">
+            <span className="w-36 shrink-0 text-ink-soft">{new Date(e.created_at).toLocaleString()}</span>
+            <span className="font-medium">{e.status ? (STATUS_LABEL[e.status] ?? e.status) : "Note"}</span>
+            {e.note && <span className="text-ink-soft">— {e.note}</span>}
+            <span className="ml-auto text-[10px] uppercase tracking-[0.18em]">{e.actor_role}</span>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-3 flex gap-2">
+        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add admin note…" className="flex-1 h-9 border border-hairline bg-transparent px-3 text-sm" />
+        <button onClick={addNote} className="text-xs tracking-[0.2em] uppercase border border-hairline px-3 h-9 hover:bg-surface-dim inline-flex items-center gap-1">
+          <MessageSquarePlus className="w-3 h-3" /> Add
+        </button>
       </div>
     </div>
   );
