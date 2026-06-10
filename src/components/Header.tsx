@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Search, Heart, ShoppingBag, User, LogOut, LayoutDashboard, Package } from "lucide-react";
 import { useAuth, useIsAdmin } from "@/hooks/useAuth";
 import { useCart } from "@/lib/cart";
-import { useSiteSettings } from "@/lib/storefront";
+import { useSiteSettings, useNavItems } from "@/lib/storefront";
 import { useState, useRef, useEffect } from "react";
 
 export function Header() {
@@ -10,6 +10,7 @@ export function Header() {
   const isAdmin = useIsAdmin(user?.id);
   const { count, setOpen: openCart } = useCart();
   const { data: settings } = useSiteSettings();
+  const { data: nav = [] } = useNavItems("header");
   const storeName = settings?.general.store_name ?? "AESTHETE";
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -24,9 +25,17 @@ export function Header() {
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 h-16 md:h-20 flex items-center justify-between">
         <Link to="/" className="font-serif text-2xl md:text-3xl tracking-[0.18em] font-bold uppercase">{storeName}</Link>
         <nav className="hidden md:flex items-center gap-10">
-          <Link to="/collections" className="nav-link">Collections</Link>
-          <Link to="/collections" search={{ filter: "new" } as never} className="nav-link">New Arrivals</Link>
-          <Link to="/collections" search={{ filter: "runway" } as never} className="nav-link">Runway</Link>
+          {nav.map((item) => (
+            <a
+              key={item.id}
+              href={item.url}
+              target={item.open_new_tab ? "_blank" : undefined}
+              rel={item.open_new_tab ? "noreferrer" : undefined}
+              className="nav-link"
+            >
+              {item.label}
+            </a>
+          ))}
           {isAdmin && <Link to="/admin" className="nav-link">Atelier</Link>}
         </nav>
         <div className="flex items-center gap-5 text-ink">
