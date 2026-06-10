@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, Trash2, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { signedUrl, isVideoUrl } from "@/lib/media";
 
 export const Route = createFileRoute("/admin/media")({ component: MediaAdmin });
 
@@ -15,7 +16,9 @@ function MediaAdmin() {
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin-media"],
     queryFn: async () => {
-      const { data, error } = await supabase.storage.from("media").list("", { limit: 200, sortBy: { column: "created_at", order: "desc" } });
+      const { data, error } = await supabase.storage.from("media").list("", {
+        limit: 200, sortBy: { column: "created_at", order: "desc" },
+      });
       if (error) throw error;
       return (data ?? []).filter((f: any) => f.name && !f.name.startsWith("."));
     },
@@ -28,7 +31,7 @@ function MediaAdmin() {
     for (const file of Array.from(files)) {
       const ext = file.name.split(".").pop() || "bin";
       const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error } = await supabase.storage.from("media").upload(path, file, { cacheControl: "31536000" });
+      const { error } = await supabase.storage.from("media").upload(path, file, { cacheControl: "31536000", contentType: file.type });
       if (error) toast.error(`${file.name}: ${error.message}`);
     }
     setBusy(false);
@@ -42,8 +45,13 @@ function MediaAdmin() {
     if (error) toast.error(error.message); else refresh();
   };
 
-  const url = (name: string) => supabase.storage.from("media").getPublicUrl(name).data.publicUrl;
-  const copy = (name: string) => { navigator.clipboard.writeText(url(name)); toast.success("URL copied."); };
+  const copy = async (name: string) => {
+    try {
+      const url = await signedUrl(name);
+      await navigator.clipboard.writeText(url);
+      toast.success("URL copied.");
+    } catch (e: any) { toast.error(e.message ?? "Failed"); }
+  };
 
   return (
     <div className="p-6 md:p-10">
@@ -62,7 +70,7 @@ function MediaAdmin() {
           {data.map((f: any) => (
             <div key={f.name} className="group relative border border-hairline">
               <div className="aspect-square bg-surface-dim overflow-hidden">
-                <img src={url(f.name)} alt={f.name} className="w-full h-full object-cover" loading="lazy" />
+                <MediaThumb name={f.name} />
               </div>
               <p className="p-2 text-[10px] text-ink-soft truncate">{f.name}</p>
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
@@ -76,4 +84,12 @@ function MediaAdmin() {
       )}
     </div>
   );
+}
+
+function MediaThumb({ name }: { name: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => { signedUrl(name).then(setUrl).catch(() => setUrl(null)); }, [name]);
+  if (!url) return <div className="w-full h-full bg-surface-dim animate-pulse" />;
+  if (isVideoUrl(name)) return <video src={url} className="w-full h-full object-cover" muted playsInline />;
+  return <img src={url} alt={name} className="w-full h-full object-cover" loading="lazy" />;
 }

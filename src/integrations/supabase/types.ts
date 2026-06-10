@@ -26,7 +26,9 @@ export type Database = {
           position: number
           subtitle: string | null
           title: string | null
+          type: string
           updated_at: string
+          video_url: string | null
           visible: boolean
         }
         Insert: {
@@ -40,7 +42,9 @@ export type Database = {
           position?: number
           subtitle?: string | null
           title?: string | null
+          type?: string
           updated_at?: string
+          video_url?: string | null
           visible?: boolean
         }
         Update: {
@@ -54,7 +58,9 @@ export type Database = {
           position?: number
           subtitle?: string | null
           title?: string | null
+          type?: string
           updated_at?: string
+          video_url?: string | null
           visible?: boolean
         }
         Relationships: []

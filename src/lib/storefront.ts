@@ -23,9 +23,10 @@ export type SiteSettings = {
 };
 
 export type HomepageSection = {
-  id: string; key: string; title: string | null; subtitle: string | null;
-  body: string | null; image_url: string | null; cta_label: string | null;
-  cta_url: string | null; position: number; visible: boolean; extra: Record<string, any>;
+  id: string; key: string; type: string; title: string | null; subtitle: string | null;
+  body: string | null; image_url: string | null; video_url: string | null;
+  cta_label: string | null; cta_url: string | null;
+  position: number; visible: boolean; extra: Record<string, any>;
 };
 
 export type NavItem = {
@@ -43,12 +44,13 @@ const defaults: SiteSettings = {
   shipping: { free_shipping_threshold: 5000, standard_rate: 250, express_rate: 600 },
 };
 
-export function useProducts(opts?: { featuredOnly?: boolean }) {
+export function useProducts(opts?: { featuredOnly?: boolean; limit?: number }) {
   return useQuery({
-    queryKey: ["storefront-products", !!opts?.featuredOnly],
+    queryKey: ["storefront-products", !!opts?.featuredOnly, opts?.limit ?? null],
     queryFn: async () => {
       let q = supabase.from("products").select("*").eq("status", "active").order("created_at", { ascending: false });
       if (opts?.featuredOnly) q = q.eq("featured", true);
+      if (opts?.limit) q = q.limit(opts.limit);
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as unknown as StoreProduct[];
@@ -82,30 +84,24 @@ export function useSiteSettings() {
     },
     staleTime: 60_000,
   });
-  // sync currency formatter to settings
   useEffect(() => {
     if (q.data?.general?.currency) setCurrencyFormat(q.data.general.currency, q.data.general.locale);
   }, [q.data?.general?.currency, q.data?.general?.locale]);
   return q;
 }
 
-export function useHomepageSections() {
+export function useHomepageSections(opts?: { onlyVisible?: boolean }) {
   return useQuery({
-    queryKey: ["homepage-sections"],
+    queryKey: ["homepage-sections", !!opts?.onlyVisible],
     queryFn: async () => {
-      const { data, error } = await supabase.from("homepage_sections" as any).select("*").order("position");
+      let q = supabase.from("homepage_sections" as any).select("*").order("position");
+      if (opts?.onlyVisible) q = q.eq("visible", true);
+      const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as unknown as HomepageSection[];
     },
-    staleTime: 30_000,
+    staleTime: 15_000,
   });
-}
-
-export function useSectionMap() {
-  const q = useHomepageSections();
-  const map: Record<string, HomepageSection | undefined> = {};
-  (q.data ?? []).forEach((s) => { map[s.key] = s; });
-  return { ...q, map };
 }
 
 export function useNavItems(location: "header" | "footer") {
@@ -134,5 +130,22 @@ export function useCmsPage(slug: string | undefined) {
       if (error) throw error;
       return (data ?? null) as unknown as CmsPage | null;
     },
+  });
+}
+
+export function useCategories() {
+  return useQuery({
+    queryKey: ["storefront-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("category, image_url")
+        .eq("status", "active");
+      if (error) throw error;
+      const map = new Map<string, string | null>();
+      (data ?? []).forEach((r: any) => { if (r.category && !map.has(r.category)) map.set(r.category, r.image_url); });
+      return Array.from(map.entries()).map(([name, image_url]) => ({ name, image_url }));
+    },
+    staleTime: 60_000,
   });
 }
