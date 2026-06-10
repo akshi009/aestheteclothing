@@ -20,6 +20,8 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminReviewsRouteImport } from './routes/admin/reviews'
+import { Route as AdminReturnsRouteImport } from './routes/admin/returns'
 import { Route as AdminPagesRouteImport } from './routes/admin/pages'
 import { Route as AdminOrdersRouteImport } from './routes/admin/orders'
 import { Route as AdminNavigationRouteImport } from './routes/admin/navigation'
@@ -84,6 +86,16 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminReviewsRoute = AdminReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminReturnsRoute = AdminReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminPagesRoute = AdminPagesRouteImport.update({
   id: '/pages',
   path: '/pages',
@@ -141,6 +153,8 @@ export interface FileRoutesByFullPath {
   '/admin/navigation': typeof AdminNavigationRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/pages': typeof AdminPagesRoute
+  '/admin/returns': typeof AdminReturnsRoute
+  '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/p/$slug': typeof PSlugRoute
   '/product/$id': typeof ProductIdRoute
@@ -161,6 +175,8 @@ export interface FileRoutesByTo {
   '/admin/navigation': typeof AdminNavigationRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/pages': typeof AdminPagesRoute
+  '/admin/returns': typeof AdminReturnsRoute
+  '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/p/$slug': typeof PSlugRoute
   '/product/$id': typeof ProductIdRoute
@@ -183,6 +199,8 @@ export interface FileRoutesById {
   '/admin/navigation': typeof AdminNavigationRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/pages': typeof AdminPagesRoute
+  '/admin/returns': typeof AdminReturnsRoute
+  '/admin/reviews': typeof AdminReviewsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/p/$slug': typeof PSlugRoute
   '/product/$id': typeof ProductIdRoute
@@ -206,6 +224,8 @@ export interface FileRouteTypes {
     | '/admin/navigation'
     | '/admin/orders'
     | '/admin/pages'
+    | '/admin/returns'
+    | '/admin/reviews'
     | '/admin/settings'
     | '/p/$slug'
     | '/product/$id'
@@ -226,6 +246,8 @@ export interface FileRouteTypes {
     | '/admin/navigation'
     | '/admin/orders'
     | '/admin/pages'
+    | '/admin/returns'
+    | '/admin/reviews'
     | '/admin/settings'
     | '/p/$slug'
     | '/product/$id'
@@ -247,6 +269,8 @@ export interface FileRouteTypes {
     | '/admin/navigation'
     | '/admin/orders'
     | '/admin/pages'
+    | '/admin/returns'
+    | '/admin/reviews'
     | '/admin/settings'
     | '/p/$slug'
     | '/product/$id'
@@ -344,6 +368,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/reviews': {
+      id: '/admin/reviews'
+      path: '/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AdminReviewsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/returns': {
+      id: '/admin/returns'
+      path: '/returns'
+      fullPath: '/admin/returns'
+      preLoaderRoute: typeof AdminReturnsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/pages': {
       id: '/admin/pages'
       path: '/pages'
@@ -412,6 +450,8 @@ interface AdminRouteRouteChildren {
   AdminNavigationRoute: typeof AdminNavigationRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminPagesRoute: typeof AdminPagesRoute
+  AdminReturnsRoute: typeof AdminReturnsRoute
+  AdminReviewsRoute: typeof AdminReviewsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -425,6 +465,8 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminNavigationRoute: AdminNavigationRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminPagesRoute: AdminPagesRoute,
+  AdminReturnsRoute: AdminReturnsRoute,
+  AdminReviewsRoute: AdminReviewsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

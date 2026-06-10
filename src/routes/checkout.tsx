@@ -90,6 +90,12 @@ function CheckoutPage() {
       return;
     }
 
+    const productIds = items.map((i) => i.productId).filter(Boolean) as string[];
+    const slugMap = new Map<string, string>();
+    if (productIds.length) {
+      const { data: prows } = await supabase.from("products").select("id,slug").in("id", productIds);
+      (prows ?? []).forEach((p: any) => slugMap.set(p.id, p.slug));
+    }
     const { error: itemsErr } = await supabase.from("order_items").insert(
       items.map((i) => ({
         order_id: order.id,
@@ -97,7 +103,9 @@ function CheckoutPage() {
         name: `${i.name}${i.size ? ` (Size ${i.size})` : ""}`,
         price: i.price,
         quantity: i.quantity,
-      })),
+        image_url: i.image || null,
+        product_slug: i.productId ? (slugMap.get(i.productId) ?? null) : null,
+      } as any)),
     );
 
     if (itemsErr) {

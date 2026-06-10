@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Heart, ChevronDown } from "lucide-react";
+import { Heart, ChevronDown, Star } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useProductBySlug, useProducts } from "@/lib/storefront";
+import { useProductReviews } from "@/lib/orders";
 import { useCart } from "@/lib/cart";
 import { currency } from "@/lib/format";
 import { toast } from "sonner";
@@ -24,8 +25,10 @@ function ProductPage() {
   const { id } = Route.useParams();
   const { data: product, isLoading } = useProductBySlug(id);
   const { data: all = [] } = useProducts();
+  const { data: reviews = [] } = useProductReviews(product?.id ?? null);
   const { add } = useCart();
   const [size, setSize] = useState<string>("M");
+  const avg = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
   if (isLoading) {
     return (
@@ -83,6 +86,12 @@ function ProductPage() {
             <div className="lg:sticky lg:top-28 self-start">
               <p className="eyebrow mb-4">{product.category}</p>
               <h1 className="font-serif text-4xl md:text-5xl leading-tight">{product.name}</h1>
+              {reviews.length > 0 && (
+                <div className="mt-3 flex items-center gap-2 text-sm">
+                  <div className="flex">{[1,2,3,4,5].map((n) => <Star key={n} className={`w-4 h-4 ${n <= Math.round(avg) ? "fill-current" : "text-ink-soft"}`} />)}</div>
+                  <span className="text-ink-soft">{avg.toFixed(1)} · {reviews.length} review{reviews.length === 1 ? "" : "s"}</span>
+                </div>
+              )}
               <p className="font-serif text-2xl mt-4">{currency(product.price)}</p>
               <p className="mt-2 text-xs tracking-[0.2em] uppercase text-ink-soft">
                 {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
@@ -119,6 +128,29 @@ function ProductPage() {
             </div>
           </div>
         </div>
+
+        <section className="max-w-[1200px] mx-auto px-6 md:px-10 mt-20">
+          <h2 className="font-serif text-3xl md:text-4xl mb-8">Customer Reviews</h2>
+          {reviews.length === 0 ? (
+            <p className="text-ink-soft text-sm">No reviews yet. Be the first to share your thoughts after your delivery.</p>
+          ) : (
+            <ul className="grid md:grid-cols-2 gap-5">
+              {reviews.map((r: any) => (
+                <li key={r.id} className="border border-hairline p-6 bg-card">
+                  <div className="flex gap-1 mb-2">{[1,2,3,4,5].map((n) => <Star key={n} className={`w-4 h-4 ${n <= r.rating ? "fill-current" : "text-ink-soft"}`} />)}</div>
+                  {r.title && <p className="font-medium mb-1">{r.title}</p>}
+                  {r.body && <p className="text-sm text-ink-soft leading-relaxed whitespace-pre-line">{r.body}</p>}
+                  {Array.isArray(r.images) && r.images.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {r.images.map((u: string) => <img key={u} src={u} alt="" className="w-16 h-16 object-cover border border-hairline" />)}
+                    </div>
+                  )}
+                  <p className="text-xs text-ink-soft mt-3">— {r.author_name || "Customer"}, {new Date(r.created_at).toLocaleDateString()}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         {related.length > 0 && (
           <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-24 md:mt-32">

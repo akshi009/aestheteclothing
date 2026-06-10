@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Star } from "lucide-react";
 import { useProducts, useCategories, type HomepageSection } from "@/lib/storefront";
+import { useFeaturedReviews } from "@/lib/orders";
 import { currency } from "@/lib/format";
 import { isVideoUrl } from "@/lib/media";
 
@@ -139,7 +140,11 @@ function OfferBlock({ s }: { s: HomepageSection }) {
 }
 
 function TestimonialsBlock({ s }: { s: HomepageSection }) {
-  const items = (s.extra?.items ?? []) as Array<{ name: string; review: string; rating?: number; avatar?: string }>;
+  const manual = (s.extra?.items ?? []) as Array<{ name: string; review: string; rating?: number; avatar?: string }>;
+  const { data: featured = [] } = useFeaturedReviews();
+  const items = featured.length > 0
+    ? featured.map((r: any) => ({ name: r.author_name || "Customer", review: r.body || r.title || "", rating: r.rating, avatar: undefined as string | undefined }))
+    : manual;
   return (
     <section className="bg-surface-dim/40">
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-20 md:py-28">
@@ -160,7 +165,7 @@ function TestimonialsBlock({ s }: { s: HomepageSection }) {
               </div>
             </div>
           ))}
-          {items.length === 0 && <p className="text-ink-soft text-sm col-span-full text-center">No reviews added yet.</p>}
+          {items.length === 0 && <p className="text-ink-soft text-sm col-span-full text-center">No reviews yet.</p>}
         </div>
       </div>
     </section>

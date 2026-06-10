@@ -109,32 +109,76 @@ export type Database = {
           },
         ]
       }
+      order_events: {
+        Row: {
+          actor_id: string | null
+          actor_role: string
+          created_at: string
+          id: string
+          note: string | null
+          order_id: string
+          status: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_role?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id: string
+          status?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_role?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
           id: string
+          image_url: string | null
           name: string
           order_id: string
           price: number
           product_id: string | null
+          product_slug: string | null
           quantity: number
         }
         Insert: {
           created_at?: string
           id?: string
+          image_url?: string | null
           name: string
           order_id: string
           price: number
           product_id?: string | null
+          product_slug?: string | null
           quantity?: number
         }
         Update: {
           created_at?: string
           id?: string
+          image_url?: string | null
           name?: string
           order_id?: string
           price?: number
           product_id?: string | null
+          product_slug?: string | null
           quantity?: number
         }
         Relationships: [
@@ -303,6 +347,125 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      return_requests: {
+        Row: {
+          admin_notes: string | null
+          comments: string | null
+          created_at: string
+          id: string
+          images: string[]
+          items: Json
+          order_id: string
+          pickup_scheduled_at: string | null
+          reason: string
+          refund_status: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          comments?: string | null
+          created_at?: string
+          id?: string
+          images?: string[]
+          items?: Json
+          order_id: string
+          pickup_scheduled_at?: string | null
+          reason: string
+          refund_status?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          comments?: string | null
+          created_at?: string
+          id?: string
+          images?: string[]
+          items?: Json
+          order_id?: string
+          pickup_scheduled_at?: string | null
+          reason?: string
+          refund_status?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          author_name: string | null
+          body: string | null
+          created_at: string
+          featured: boolean
+          id: string
+          images: string[]
+          order_id: string | null
+          product_id: string
+          rating: number
+          status: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string | null
+          body?: string | null
+          created_at?: string
+          featured?: boolean
+          id?: string
+          images?: string[]
+          order_id?: string | null
+          product_id: string
+          rating: number
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string | null
+          body?: string | null
+          created_at?: string
+          featured?: boolean
+          id?: string
+          images?: string[]
+          order_id?: string | null
+          product_id?: string
+          rating?: number
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {
