@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Store,
-  Image as ImageIcon, Menu as MenuIcon, FileText, Home,
+  Image as ImageIcon, Menu as MenuIcon, FileText, Home, Star, RotateCcw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -13,6 +13,8 @@ const items = [
   { to: "/admin/media", label: "Media", icon: ImageIcon },
   { to: "/admin/inventory", label: "Inventory", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { to: "/admin/reviews", label: "Reviews", icon: Star },
+  { to: "/admin/returns", label: "Returns", icon: RotateCcw },
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/settings", label: "Settings", icon: Settings },
