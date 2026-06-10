@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/lib/cart";
+import { currency } from "@/lib/format";
 import { useEffect } from "react";
 
 export function CartDrawer() {

@@ -1,11 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, BarChart3, Settings, LogOut, Store,
+  Image as ImageIcon, Menu as MenuIcon, FileText, Home,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const items: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
+const items = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/admin/homepage", label: "Homepage", icon: Home },
+  { to: "/admin/pages", label: "Pages", icon: FileText },
+  { to: "/admin/navigation", label: "Navigation", icon: MenuIcon },
+  { to: "/admin/media", label: "Media", icon: ImageIcon },
   { to: "/admin/inventory", label: "Inventory", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { to: "/admin/customers", label: "Customers", icon: Users },

@@ -4,11 +4,20 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { setCurrencyFormat } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/settings")({ component: Settings });
 
-type General = { store_name: string; currency: string; support_email: string; tagline: string };
+type General = { store_name: string; currency: string; locale: string; support_email: string; tagline: string };
 type Shipping = { free_shipping_threshold: number; standard_rate: number; express_rate: number };
+
+const CURRENCIES = [
+  { code: "INR", locale: "en-IN", label: "Indian Rupee (₹)" },
+  { code: "USD", locale: "en-US", label: "US Dollar ($)" },
+  { code: "EUR", locale: "en-IE", label: "Euro (€)" },
+  { code: "GBP", locale: "en-GB", label: "Pound Sterling (£)" },
+  { code: "AED", locale: "en-AE", label: "UAE Dirham (د.إ)" },
+];
 
 function Settings() {
   const qc = useQueryClient();
@@ -22,14 +31,13 @@ function Settings() {
     },
   });
 
-  const [general, setGeneral] = useState<General>({ store_name: "AESTHETE", currency: "USD", support_email: "", tagline: "" });
-  const [shipping, setShipping] = useState<Shipping>({ free_shipping_threshold: 500, standard_rate: 25, express_rate: 60 });
+  const [general, setGeneral] = useState<General>({ store_name: "AESTHETE", currency: "INR", locale: "en-IN", support_email: "", tagline: "" });
+  const [shipping, setShipping] = useState<Shipping>({ free_shipping_threshold: 5000, standard_rate: 250, express_rate: 600 });
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (data?.general) setGeneral({ ...general, ...data.general });
-    if (data?.shipping) setShipping({ ...shipping, ...data.shipping });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (data?.general) setGeneral((g) => ({ ...g, ...data.general }));
+    if (data?.shipping) setShipping((s) => ({ ...s, ...data.shipping }));
   }, [data]);
 
   const save = async () => {
@@ -40,8 +48,10 @@ function Settings() {
     ]);
     setBusy(false);
     if (error) return toast.error(error.message);
+    setCurrencyFormat(general.currency, general.locale);
     toast.success("Settings saved.");
     qc.invalidateQueries({ queryKey: ["site-settings"] });
+    qc.invalidateQueries({ queryKey: ["storefront-settings"] });
   };
 
   const inp = "w-full h-12 border border-hairline bg-transparent px-4 text-sm focus:border-primary outline-none";
@@ -57,14 +67,26 @@ function Settings() {
         <h2 className="font-serif text-xl mb-6">General</h2>
         <div className="grid sm:grid-cols-2 gap-5">
           <Field label="Store Name"><input value={general.store_name} onChange={(e) => setGeneral({ ...general, store_name: e.target.value })} className={inp} /></Field>
-          <Field label="Currency"><input value={general.currency} onChange={(e) => setGeneral({ ...general, currency: e.target.value })} className={inp} /></Field>
+          <Field label="Currency">
+            <select
+              value={general.currency}
+              onChange={(e) => {
+                const c = CURRENCIES.find((x) => x.code === e.target.value);
+                setGeneral({ ...general, currency: e.target.value, locale: c?.locale ?? general.locale });
+              }}
+              className={inp}
+            >
+              {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
+            </select>
+          </Field>
           <Field label="Support Email"><input type="email" value={general.support_email} onChange={(e) => setGeneral({ ...general, support_email: e.target.value })} className={inp} /></Field>
+          <Field label="Locale"><input value={general.locale} onChange={(e) => setGeneral({ ...general, locale: e.target.value })} className={inp} placeholder="en-IN" /></Field>
           <Field label="Tagline" className="sm:col-span-2"><input value={general.tagline} onChange={(e) => setGeneral({ ...general, tagline: e.target.value })} className={inp} /></Field>
         </div>
       </section>
 
       <section className="border border-hairline bg-card p-6 md:p-8 mb-8">
-        <h2 className="font-serif text-xl mb-6">Shipping</h2>
+        <h2 className="font-serif text-xl mb-6">Shipping ({general.currency})</h2>
         <div className="grid sm:grid-cols-3 gap-5">
           <Field label="Free Shipping Over"><input type="number" min="0" value={shipping.free_shipping_threshold} onChange={(e) => setShipping({ ...shipping, free_shipping_threshold: +e.target.value })} className={inp} /></Field>
           <Field label="Standard Rate"><input type="number" min="0" value={shipping.standard_rate} onChange={(e) => setShipping({ ...shipping, standard_rate: +e.target.value })} className={inp} /></Field>
