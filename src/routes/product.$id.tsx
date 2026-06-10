@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Heart, ChevronDown } from "lucide-react";
+import { Heart, ChevronDown, Star } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useProductBySlug, useProducts } from "@/lib/storefront";
+import { useProductReviews } from "@/lib/orders";
 import { useCart } from "@/lib/cart";
 import { currency } from "@/lib/format";
 import { toast } from "sonner";
@@ -24,8 +25,10 @@ function ProductPage() {
   const { id } = Route.useParams();
   const { data: product, isLoading } = useProductBySlug(id);
   const { data: all = [] } = useProducts();
+  const { data: reviews = [] } = useProductReviews(product?.id ?? null);
   const { add } = useCart();
   const [size, setSize] = useState<string>("M");
+  const avg = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
   if (isLoading) {
     return (
