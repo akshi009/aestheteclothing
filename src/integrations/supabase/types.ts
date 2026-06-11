@@ -284,6 +284,7 @@ export type Database = {
           featured: boolean
           id: string
           image_url: string | null
+          images: Json
           name: string
           price: number
           slug: string
@@ -298,6 +299,7 @@ export type Database = {
           featured?: boolean
           id?: string
           image_url?: string | null
+          images?: Json
           name: string
           price?: number
           slug: string
@@ -312,6 +314,7 @@ export type Database = {
           featured?: boolean
           id?: string
           image_url?: string | null
+          images?: Json
           name?: string
           price?: number
           slug?: string
