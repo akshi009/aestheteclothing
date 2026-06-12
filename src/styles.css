@@ -33,37 +33,57 @@
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-hairline: var(--hairline);
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --color-gold: var(--gold);
+  --font-serif: "Cormorant Garamond", "Playfair Display", ui-serif, Georgia, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --tracking-luxe: 0.18em;
 }
 
 :root {
-  --radius: 0.5rem;
-  --background: oklch(0.985 0.003 100);
-  --foreground: oklch(0.16 0.005 270);
-  --surface: oklch(0.985 0.003 100);
-  --surface-dim: oklch(0.95 0.004 270);
-  --ink: oklch(0.16 0.005 270);
-  --ink-soft: oklch(0.45 0.005 270);
-  --hairline: oklch(0.88 0.004 270);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0.005 270);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.005 270);
-  --primary: oklch(0.16 0.005 270);
-  --primary-foreground: oklch(0.985 0.003 100);
-  --secondary: oklch(0.95 0.004 270);
-  --secondary-foreground: oklch(0.16 0.005 270);
-  --muted: oklch(0.95 0.004 270);
-  --muted-foreground: oklch(0.5 0.005 270);
-  --accent: oklch(0.95 0.004 270);
-  --accent-foreground: oklch(0.16 0.005 270);
+  --radius: 0.25rem;
+
+  /* Warm ivory base */
+  --background: oklch(0.977 0.018 82);
+  --foreground: oklch(0.17 0.03 45);
+  --surface: oklch(0.977 0.018 82);
+  /* Warm sand */
+  --surface-dim: oklch(0.93 0.025 78);
+
+  /* Warm brown text */
+  --ink: oklch(0.17 0.03 45);
+  --ink-soft: oklch(0.5 0.022 52);
+
+  /* Warm golden hairline */
+  --hairline: oklch(0.86 0.022 74);
+
+  /* Cards: slightly lighter cream */
+  --card: oklch(0.993 0.012 82);
+  --card-foreground: oklch(0.17 0.03 45);
+  --popover: oklch(0.993 0.012 82);
+  --popover-foreground: oklch(0.17 0.03 45);
+
+  /* Primary: deep maroon / jewel red */
+  --primary: oklch(0.34 0.13 22);
+  --primary-foreground: oklch(0.977 0.018 82);
+
+  /* Secondary: warm sand */
+  --secondary: oklch(0.93 0.025 78);
+  --secondary-foreground: oklch(0.17 0.03 45);
+
+  --muted: oklch(0.93 0.025 78);
+  --muted-foreground: oklch(0.52 0.02 55);
+
+  /* Accent: antique gold */
+  --accent: oklch(0.78 0.1 78);
+  --accent-foreground: oklch(0.17 0.03 45);
+  --gold: oklch(0.76 0.1 78);
+
   --destructive: oklch(0.55 0.22 27);
-  --destructive-foreground: oklch(0.985 0.003 100);
-  --border: oklch(0.88 0.004 270);
-  --input: oklch(0.88 0.004 270);
-  --ring: oklch(0.16 0.005 270);
+  --destructive-foreground: oklch(0.977 0.018 82);
+
+  --border: oklch(0.86 0.022 74);
+  --input: oklch(0.86 0.022 74);
+  --ring: oklch(0.34 0.13 22);
 }
 
 @layer base {
@@ -76,11 +96,11 @@
   }
   h1, h2, h3, .font-serif { font-family: var(--font-serif); }
   .eyebrow {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     letter-spacing: var(--tracking-luxe);
     text-transform: uppercase;
-    color: var(--color-ink-soft);
-    font-weight: 500;
+    color: var(--color-gold);
+    font-weight: 600;
   }
   .nav-link {
     font-size: 0.78rem;
@@ -88,27 +108,38 @@
     text-transform: uppercase;
     color: var(--color-ink);
     font-weight: 500;
-    transition: opacity 0.2s ease;
+    transition: color 0.2s ease;
   }
-  .nav-link:hover { opacity: 0.6; }
+  .nav-link:hover { color: var(--color-primary); }
   .btn-primary {
     background: var(--color-primary);
     color: var(--color-primary-foreground);
-    padding: 0.95rem 1.6rem;
+    padding: 0.95rem 1.75rem;
     font-size: 0.72rem;
     letter-spacing: var(--tracking-luxe);
     text-transform: uppercase;
-    font-weight: 500;
-    transition: opacity 0.2s ease;
+    font-weight: 600;
+    transition: all 0.25s ease;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
   }
-  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,215,100,0.18) 60%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+  .btn-primary:hover::after { transform: translateX(100%); }
+  .btn-primary:hover { opacity: 0.9; }
   .btn-ghost {
     background: transparent;
     color: var(--color-ink);
-    padding: 0.95rem 1.6rem;
+    padding: 0.95rem 1.75rem;
     font-size: 0.72rem;
     letter-spacing: var(--tracking-luxe);
     text-transform: uppercase;
@@ -116,22 +147,88 @@
     border: 1px solid var(--color-hairline);
     transition: all 0.2s ease;
   }
-  .btn-ghost:hover { border-color: var(--color-ink); }
+  .btn-ghost:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
   .glass {
-    background: color-mix(in oklab, white 70%, transparent);
+    background: color-mix(in oklab, oklch(0.977 0.018 82) 85%, transparent);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+  }
+  /* Decorative gold divider */
+  .gold-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-gold), transparent);
+    opacity: 0.6;
+  }
+  /* Festive pattern border */
+  .border-festive {
+    border: 1px solid var(--color-hairline);
+    box-shadow: 0 0 0 3px oklch(0.977 0.018 82), 0 0 0 4px var(--color-hairline);
   }
 }
 
+/* ── Marquee ── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ── Floating ── */
 @keyframes float-soft {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-14px) rotate(1deg); }
 }
 .animate-float { animation: float-soft 7s ease-in-out infinite; }
 
+/* ── Fade up ── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up { animation: fade-up 0.8s ease-out both; }
+
+/* ── Gold shimmer text ── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.text-gold-shimmer {
+  background: linear-gradient(90deg, oklch(0.65 0.12 75), oklch(0.82 0.1 85), oklch(0.7 0.13 70), oklch(0.82 0.1 85), oklch(0.65 0.12 75));
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ── Sparkle pulse ── */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
+.animate-sparkle { animation: sparkle 2s ease-in-out infinite; }
+
+/* ── Slow spin ── */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow { animation: spin-slow 12s linear infinite; }
+
+/* ── Counter pulse ── */
+@keyframes count-pop {
+  0%  { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100%{ transform: scale(1); }
+}
+.animate-count-pop { animation: count-pop 0.35s ease-out; }
+
+/* ── Scrollbar hide (reel strip) ── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
