@@ -279,6 +279,7 @@ export type Database = {
       products: {
         Row: {
           category: string
+          composition_care: string | null
           created_at: string
           description: string | null
           featured: boolean
@@ -287,6 +288,7 @@ export type Database = {
           images: Json
           name: string
           price: number
+          shipping_returns: string | null
           slug: string
           status: string
           stock: number
@@ -294,6 +296,7 @@ export type Database = {
         }
         Insert: {
           category?: string
+          composition_care?: string | null
           created_at?: string
           description?: string | null
           featured?: boolean
@@ -302,6 +305,7 @@ export type Database = {
           images?: Json
           name: string
           price?: number
+          shipping_returns?: string | null
           slug: string
           status?: string
           stock?: number
@@ -309,6 +313,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          composition_care?: string | null
           created_at?: string
           description?: string | null
           featured?: boolean
@@ -317,6 +322,7 @@ export type Database = {
           images?: Json
           name?: string
           price?: number
+          shipping_returns?: string | null
           slug?: string
           status?: string
           stock?: number
